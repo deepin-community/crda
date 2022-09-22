@@ -1,0 +1,27 @@
+From 7bf7313dc0a000176267e137105ffeddd2b4e87c Mon Sep 17 00:00:00 2001
+From: Romain Perier <romain.perier@gmail.com>
+Date: Tue, 25 Feb 2020 13:29:10 +0100
+Subject: [PATCH] Makefile: Check for libnl only when building
+
+So we're able to build the package by using sbuild which triggers
+a dh_auto_clean that calls make clean, without stopping the build.
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: crda/Makefile
+===================================================================
+--- crda.orig/Makefile
++++ crda/Makefile
+@@ -88,9 +88,11 @@ else
+ 	endif
+ endif
+ 
++ifneq (,$(filter-out %clean,$(MAKECMDGOALS)))
+ ifeq ($(NLLIBNAME),)
+ $(error Cannot find development files for any supported version of libnl)
+ endif
++endif
+ 
+ NLLIBS += `$(PKG_CONFIG) --libs $(NLLIBNAME)`
+ CFLAGS += `$(PKG_CONFIG) --cflags $(NLLIBNAME)`

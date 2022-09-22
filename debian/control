@@ -1,0 +1,30 @@
+Source: crda
+Section: net
+Priority: optional
+Maintainer: Debian kernel team <debian-kernel@lists.debian.org>
+Uploaders: Ben Hutchings <benh@debian.org>
+Build-Depends: debhelper (>= 9),
+ libnl-3-dev (>= 3.2.3-2~) [linux-any],
+ libnl-genl-3-dev (>= 3.2.3-2~) [linux-any],
+ libssl-dev,
+ pkg-config
+Rules-Requires-Root: no
+Standards-Version: 4.5.0
+Vcs-Git: https://salsa.debian.org/kernel-team/crda.git
+Vcs-Browser: https://salsa.debian.org/kernel-team/crda
+Homepage: https://wireless.wiki.kernel.org/en/developers/Regulatory/CRDA
+
+Package: crda
+Architecture: linux-any
+Multi-Arch: foreign
+Depends: ${shlibs:Depends},
+ ${misc:Depends},
+ wireless-regdb,
+ iw (>= 3.2-1~)
+Description: wireless Central Regulatory Domain Agent
+ This package provides a Central Regulatory Domain Agent (CRDA) to be used by
+ the Linux kernel cfg80211 wireless subsystem to query and apply the regulatory
+ domain settings wireless devices may operate within for a given location.
+ .
+ CRDA queries operational frequency regulations stored within the regulatory
+ database provided by the wireless-regdb package.

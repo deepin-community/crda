@@ -1,0 +1,4 @@
+version=3
+opts="mode=git, pgpmode=none, pretty=4.14+git%cd.%h" \
+https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/crda.git \
+HEAD

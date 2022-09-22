@@ -1,0 +1,66 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Tue, 31 Mar 2020 22:12:38 +0100
+Subject: Install crda binary under libexec directory
+
+The crda binary should only be run as part of a udev rule, and doesn't
+do anything useful if the COUNTRY environment variable is unset or the
+kernel isn't expecting a rule set.
+
+Debian policy is that binaries requiring special environment variables
+to be set shouldn't be installed in a directory that's in the default
+path.  Usually such binaries should be installed under /usr/libexec,
+or /usr/lib on distributions that don't believe in libexec.
+
+So install it in LIBEXECDIR, defaulting to $(PREFIX)/libexec.
+
+---
+--- a/Makefile
++++ b/Makefile
+@@ -7,6 +7,7 @@ PREFIX ?= /usr/
+ MANDIR ?= $(PREFIX)/share/man/
+ INCLUDE_DIR ?= $(PREFIX)/include/reglib/
+ LIBDIR ?= $(PREFIX)/lib
++LIBEXECDIR ?= $(PREFIX)/libexec
+ 
+ SBINDIR ?= /sbin/
+ 
+@@ -176,16 +177,17 @@ verify: $(REG_BIN) regdbdump
+ 
+ install: install-libreg install-libreg-headers crda crda.8.gz regdbdump.8.gz
+ 	$(NQ) '  INSTALL  crda'
+-	$(Q)$(MKDIR) $(DESTDIR)/$(SBINDIR)
+-	$(Q)$(INSTALL) -m 755 -t $(DESTDIR)/$(SBINDIR) crda
++	$(Q)$(MKDIR) $(DESTDIR)/$(LIBEXECDIR)
++	$(Q)$(INSTALL) -m 755 -t $(DESTDIR)/$(LIBEXECDIR) crda
+ 	$(NQ) '  INSTALL  regdbdump'
++	$(Q)$(MKDIR) $(DESTDIR)/$(SBINDIR)
+ 	$(Q)$(INSTALL) -m 755 -t $(DESTDIR)/$(SBINDIR) regdbdump
+ 	$(NQ) '  INSTALL  $(UDEV_LEVEL)regulatory.rules'
+ 	$(Q)$(MKDIR) $(DESTDIR)/$(UDEV_RULE_DIR)/
+ 	@# This removes the old rule you may have, we were not
+ 	@# putting it in the right place.
+ 	$(Q)rm -f $(DESTDIR)/etc/udev/rules.d/regulatory.rules
+-	$(Q)sed 's:$$(SBINDIR):$(SBINDIR):' udev/regulatory.rules > udev/regulatory.rules.parsed
++	$(Q)sed 's:$$(LIBEXECDIR):$(LIBEXECDIR):' udev/regulatory.rules > udev/regulatory.rules.parsed
+ 	$(Q)ln -sf regulatory.rules.parsed udev/$(UDEV_LEVEL)regulatory.rules
+ 	$(Q)$(INSTALL) -m 644 -t \
+ 		$(DESTDIR)/$(UDEV_RULE_DIR)/ \
+--- a/udev/regulatory.rules
++++ b/udev/regulatory.rules
+@@ -2,4 +2,4 @@
+ # For more information see:
+ # http://wireless.kernel.org/en/developers/Regulatory/CRDA
+ 
+-KERNEL=="regulatory*", ACTION=="change", SUBSYSTEM=="platform", RUN+="$(SBINDIR)crda"
++KERNEL=="regulatory*", ACTION=="change", SUBSYSTEM=="platform", RUN+="$(LIBEXECDIR)/crda"
+--- a/crda.8
++++ b/crda.8
+@@ -68,7 +68,7 @@ An example udev rule which can be used (
+ .B /lib/udev/rules.d/85-regulatory.rules
+ ):
+ 
+-.I KERNEL=="regulatory*", ACTION=="change", SUBSYSTEM=="platform", RUN+="/sbin/crda"
++.I KERNEL=="regulatory*", ACTION=="change", SUBSYSTEM=="platform", RUN+="/usr/libexec/crda"
+ 
+ .SS
+ .SH Environment variable

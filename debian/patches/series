@@ -1,0 +1,7 @@
+do_not_embed_pubkeys.patch
+do-not-run-ldconfig-if-destdir-is-set.patch
+fix-linking-of-libraries-used-by-reglib.patch
+cross.patch
+Makefile-Check-for-libnl-only-when-building.patch
+use-ldflags-when-building-reglib.patch
+install-crda-binary-under-libexec-directory.patch

@@ -1,0 +1,19 @@
+From: Ben Hutchings <benh@debian.org>
+Date: Tue, 31 Mar 2020 21:28:37 +0100
+Subject: Use $(LDFLAGS) when building reglib
+
+$(LDFLAGS) should be used when building shared libraries as well as
+when building executables.
+
+---
+--- a/Makefile
++++ b/Makefile
+@@ -125,7 +125,7 @@ keys-%.c: utils/key2pub.py $(wildcard $(
+ 
+ $(LIBREG): reglib.c regdb.h reglib.h
+ 	$(NQ) '  CC  ' $@
+-	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $< $(LIBREGLDLIBS)
++	$(Q)$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) -o $@ -shared -Wl,-soname,$(LIBREG) $< $(LIBREGLDLIBS)
+ 
+ install-libreg-headers:
+ 	$(NQ) '  INSTALL  libreg-headers'
